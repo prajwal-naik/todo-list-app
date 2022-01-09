@@ -1,0 +1,26 @@
+[
+    {
+        "task":"Complete online JavaScript course",
+        "status":"completed"
+    },
+    {
+        "task":"Jog around the park 3x",
+        "status":"active"
+    },
+    {
+        "task":"10 minutes meditation",
+        "status":"active"
+    },
+    {
+        "task":"Read for 1 hour",
+        "status":"active"
+    },
+    {
+        "task":"Pick up groceries",
+        "status":"active"
+    },
+    {
+        "task":"Complete Todo App on Frontend Mentor",
+        "status":"active"
+    }
+]
