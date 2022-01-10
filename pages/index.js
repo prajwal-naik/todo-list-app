@@ -1,11 +1,9 @@
 import Head from 'next/head'
-// import Image from 'next/image'
-// import styles from '../styles/Home.module.css'
+
+
 import { IoClose, IoReturnDownBackSharp, IoSunny } from "react-icons/io5";
-// import data from "../data.json"
-import { useEffect, useState } from 'react';
-// import tailwindcss from 'tailwindcss';
-// import { writeJsonFile } from 'write-json-file';
+import { useEffect, useState, useCallback } from 'react';
+import update from 'immutability-helper'
 
 
 function TaskName({name, status}){
@@ -19,26 +17,32 @@ function TaskName({name, status}){
 
 const masterTask = [
 	{
+		"id":1,
 		"task":"Complete online JavaScript course",
 		"status":"completed"
 	},
 	{
+		"id":2,
 		"task":"Jog around the park 3x",
 		"status":"active"
 	},
 	{
+		"id":3,
 		"task":"10 minutes meditation",
 		"status":"active"
 	},
 	{
+		"id":4,
 		"task":"Read for 1 hour",
 		"status":"active"
 	},
 	{
+		"id": 5,
 		"task":"Pick up groceries",
 		"status":"active"
 	},
 	{
+		"id":6,
 		"task":"Complete Todo App on Frontend Mentor",
 		"status":"active"
 	}
@@ -48,9 +52,46 @@ const masterTask = [
 // 	await writeJsonFile("../data-copy.json", tasks)
 // }
 
+// function TaskRow({task}){
+// 	return(
+// 		<div >
+// 			<div key={task.id} className='flex p-[15px] gap-[25px] items-center border-b-[0.5px] border-b-[#5f668271]' onMouseEnter={() => {showCloseIcon(task.task.toLowerCase().split(" ").join())}} onMouseLeave={() => {hideCloseIcon(task.task.toLowerCase().split(" ").join())}}>
+// 				<div className={`${task.status === "completed" ? "bg-gradient-to-br from-[#57DDFF] to-[#C058F3]":null} h-[18px] w-[18px] rounded-full border-[1px] border-[#5f6682] cursor-pointer hover:border-white transition-all duration-300 flex items-center justify-center`} 
+// 					onClick={()=>{
+// 						changeTaskStatus(task.task.toLowerCase().split(" ").join())
+// 					}}>
+// 					<img src = "/images/icon-check.svg" className='h-[50%]' className = {`${task.status === "active"?"hidden":""}`}/>
+
+// 				</div>
+// 				<TaskName name = {task.task} status = {task.status} />
+// 				<IoClose fill="#25273c" id={`${task.task.toLowerCase().split(" ").join()}`} className='transition-all duration-300 cursor-pointer' 
+// 					onClick={()=>{
+// 						deleteTask(task.id)
+// 					}}
+// 				/>
+// 			</div>
+			
+// 		</div>
+		
+// 	)	
+// }
+
 export default function Home() {
 
+
+	
+
 	const [tasks, setTasks] = useState([])
+
+	const moveTask = useCallback((dragIndex, hoverIndex) => {
+		const dragTask = tasks[dragIndex];
+		setTasks(update(tasks, {
+			$splice: [
+				[dragIndex, 1],
+				[hoverIndex, 0, dragTask],
+			],
+		}));
+	}, [tasks]);
 
 	const [newTaskStatus, setNewTaskStatus] = useState("active")
 
@@ -63,94 +104,133 @@ export default function Home() {
 	
 
 	useEffect(()=>{
-		var localStorageTasks = localStorage.getItem("taskData")
-		if(!localStorageTasks){
-			localStorage.setItem("taskData",JSON.stringify(masterTask))
+		var localStorageData = localStorage.getItem("taskData")
+		if(!localStorageData){
+			localStorage.setItem("taskData",JSON.stringify({
+				"taskLength":masterTask.length,
+				"tasks":[...masterTask]
+			}))
 		}
-		localStorageTasks = JSON.parse(localStorage.getItem("taskData"))
-		setTasks(localStorageTasks)
-		// console.log(tasks)
+		localStorageData = JSON.parse(localStorage.getItem("taskData"))
+		// console.log("local", localStorageData)
+		setTasks(localStorageData.tasks)
+		// console.log(tasks) 
+		setTaskCount(localStorageData.taskLength)
+		// console.log("Calling UE 1")
 	}, [])
 
+	useEffect(()=>{
+		// console.log("tasks after adding", tasks)
+		localStorage.setItem("taskData", JSON.stringify({
+			"length":tasks.length,
+			"tasks":[
+				...tasks
+			]
+		}))
+		// console.log("Calling UE 2")
+
+	}, [tasks])
+
+
+
 	const showActive = () => {
-		var localStorageTasks = localStorage.getItem("taskData")
-		if(!localStorageTasks){
-			localStorage.setItem("taskData",JSON.stringify(masterTask))
+		var localStorageData = localStorage.getItem("taskData")
+		if(!localStorageData){
+			localStorage.setItem("taskData",JSON.stringify({
+				"taskLength":masterTask.length,
+				"tasks":[...masterTask]
+			}))
 		}
-		localStorageTasks = JSON.parse(localStorage.getItem("taskData")).filter(function(task) {
+		localStorageData = JSON.parse(localStorage.getItem("taskData")).tasks.filter(function(task) {
 			return task.status === "active";
 		})
-		setTasks(localStorageTasks)
+		setTasks(localStorageData)
 		console.log(tasks)
 	}
 
 	const showAll = () => {
-		var localStorageTasks = localStorage.getItem("taskData")
-		if(!localStorageTasks){
-			localStorage.setItem("taskData",JSON.stringify(masterTask))
+		var localStorageData = localStorage.getItem("taskData")
+		if(!localStorageData){
+			localStorage.setItem("taskData",JSON.stringify({
+				"taskLength":masterTask.length,
+				"tasks":[...masterTask]
+			}))
 		}
-		localStorageTasks = JSON.parse(localStorage.getItem("taskData"))
-		setTasks(localStorageTasks)
+		localStorageData = JSON.parse(localStorage.getItem("taskData")).tasks
+		setTasks(localStorageData)
 	}
 
 	const showCompleted = () => {
-		var localStorageTasks = localStorage.getItem("taskData")
-		if(!localStorageTasks){
-			localStorage.setItem("taskData",JSON.stringify(masterTask))
+		var localStorageData = localStorage.getItem("taskData")
+		if(!localStorageData){
+			localStorage.setItem("taskData",JSON.stringify({
+				"taskLength":masterTask.length,
+				"tasks":[...masterTask]
+			}))
 		}
-		localStorageTasks = JSON.parse(localStorage.getItem("taskData")).filter(function(task) {
+		localStorageData = JSON.parse(localStorage.getItem("taskData")).tasks.filter(function(task) {
 			return task.status === "completed";
 		})
-		setTasks(localStorageTasks)
+		setTasks(localStorageData)
+		console.log(tasks)
 	}
 
 	const clearCompleted = () => {
-		var localStorageTasks = localStorage.getItem("taskData")
-		if(!localStorageTasks){
-			localStorage.setItem("taskData",JSON.stringify(masterTask))
+		var localStorageData = localStorage.getItem("taskData")
+		if(!localStorageData){
+			localStorage.setItem("taskData",JSON.stringify({
+				"taskLength":masterTask.length,
+				"tasks":[...masterTask]
+			}))
 		}
-		localStorageTasks = JSON.parse(localStorage.getItem("taskData")).filter(function(task) {
+		localStorageData = JSON.parse(localStorage.getItem("taskData")).tasks.filter(function(task) {
 			return task.status !== "completed";
 		})
-		setTasks(localStorageTasks)
-		localStorage.setItem("taskData", JSON.stringify(localStorageTasks))
-
-	}
-
-
-	
+		setTasks(localStorageData)
+		// console.log(tasks)
+		localStorage.setItem("taskData",JSON.stringify({
+			"taskLength":localStorageData.length,
+			"tasks":[...localStorageData]
+		}))	}
 
 	const addTask = (e) => {
 		if (e.key === 'Enter' && e.target.value) {
 			e.preventDefault()
-			setTasks([
-				{
-					task:e.target.value,
-					status: newTaskStatus,
-				},
-				...tasks
-			]);
-			localStorage.setItem("taskData", JSON.stringify([
-				{
-					task:e.target.value,
-					status: newTaskStatus,
-				},
-				...tasks
-			]))
-			e.target.value = ""
-			setNewTaskStatus("active")
-			
-			// writeToFile(tasks)
+			var tasksCopy = tasks.slice()
+			tasksCopy.unshift({
+				"id":tasks.length+1,
+				"task":e.target.value,
+				"status":newTaskStatus
+			})
+			setTasks(tasksCopy)
+			localStorage.setItem("taskData", JSON.stringify({
+				"length":tasksCopy.length,
+				"tasks":[
+					...tasksCopy
+				]
+			}))
+		
+		e.target.value = ""
+		setNewTaskStatus("active")
+
 		}  
 	}
 
-	const deleteTask = (taskName) => {
+	const deleteTask = (id) => {
 		var tasksCopy = tasks.slice()
+		// console.log("Deleting id:", id)
+		
 		tasksCopy = tasksCopy.filter(function(task) {
-			return task.task.toLowerCase().split(" ").join() !== taskName;
+			return task.id !== id;
 		})
 		setTasks(tasksCopy)
-		localStorage.setItem("taskData", JSON.stringify(tasksCopy))
+		var newLength = tasksCopy.length
+		localStorage.setItem("taskData", JSON.stringify({
+			"length":newLength,
+			"tasks":[
+				...tasksCopy
+			]
+		}))
 	}
 
 	const changeTaskStatus = (taskName) => {
@@ -165,17 +245,21 @@ export default function Home() {
 			}
 		}
 		setTasks(tasksCopy)
-		localStorage.setItem("taskData", JSON.stringify(tasksCopy))
-		// console.log(tasksCopy)
+		localStorage.setItem("taskData", JSON.stringify({
+			"length":tasks.length,
+			"tasks":[
+				...tasksCopy
+			]
+		}))		// console.log(tasksCopy)
 		// forceUpdate()
 	}
 
-	useEffect(()=>{
-		setTaskCount(tasks.length)
-		// console.log(dispTag)
-		// console.log(tasks)
-		// console.log(tasks.length)
-	}, [tasks])
+	// useEffect(()=>{
+	// 	setTaskCount(tasks.length)
+	// 	// console.log(dispTag)
+	// 	// console.log(tasks)
+	// 	// console.log(tasks.length)
+	// }, [tasks])
 
 	const showCloseIcon = (icon) => {
 		let closeIcon = document.getElementById(icon);
@@ -222,10 +306,11 @@ export default function Home() {
 				<div className='flex max-h-[50vh] flex-col my-[10px] bg-[#25273c] rounded-md'>
 					<div className='overflow-y-scroll scrollbar-hide'>
 						{
+							
 							tasks.map((task)=>{
 								return(
-									// <div >
-										<div key={task.task} className='flex p-[15px] gap-[25px] items-center border-b-[0.5px] border-b-[#5f668271]' onMouseEnter={() => {showCloseIcon(task.task.toLowerCase().split(" ").join())}} onMouseLeave={() => {hideCloseIcon(task.task.toLowerCase().split(" ").join())}}>
+									<div>
+										<div key={task.id} className='flex p-[15px] gap-[25px] items-center border-b-[0.5px] border-b-[#5f668271]' onMouseEnter={() => {showCloseIcon(task.task.toLowerCase().split(" ").join())}} onMouseLeave={() => {hideCloseIcon(task.task.toLowerCase().split(" ").join())}}>
 											<div className={`${task.status === "completed" ? "bg-gradient-to-br from-[#57DDFF] to-[#C058F3]":null} h-[18px] w-[18px] rounded-full border-[1px] border-[#5f6682] cursor-pointer hover:border-white transition-all duration-300 flex items-center justify-center`} 
 												onClick={()=>{
 													changeTaskStatus(task.task.toLowerCase().split(" ").join())
@@ -236,19 +321,20 @@ export default function Home() {
 											<TaskName name = {task.task} status = {task.status} />
 											<IoClose fill="#25273c" id={`${task.task.toLowerCase().split(" ").join()}`} className='transition-all duration-300 cursor-pointer' 
 												onClick={()=>{
-													deleteTask(task.task.toLowerCase().split(" ").join())
+													deleteTask(task.id)
 												}}
 											/>
 										</div>
 										
-									// </div>
+									</div>
+									// <TaskRow task = {task} />
 									
 								)	
 							})
 						}
 					</div>
 					<div className='sticky top-[100%] bg-[#25273c] rounded-b-md  w-full border-t-[1px] border-t-[#5f6682] text-[14px] flex items-center justify-between px-[10px] py-[8px]'>
-						<p className='text-[#5f6682] hover:text-white transition-all duration-300 cursor-pointer'>{taskCount} item(s) {dispTag==="all"?"in all":dispTag.toLowerCase()} </p>
+						<p className='text-[#5f6682] hover:text-white transition-all duration-300 cursor-pointer'>{tasks.length} item(s) {dispTag==="all"?"in all":dispTag.toLowerCase()} </p>
 						<div className='flex gap-[15px] text-[#5f6682]'>
 							<p className={`${dispTag ==="all"?"text-blue-500":null} hover:text-white transition-all duration-300 cursor-pointer`} onClick={()=>{setDispTag("all"); showAll()}}>All</p>
 							<p className={`${dispTag ==="active"?"text-blue-500":null} hover:text-white transition-all duration-300 cursor-pointer`} onClick={()=>{setDispTag("active"); showActive()}}>Active</p>
@@ -269,48 +355,3 @@ export default function Home() {
 }
 
 
-// export async function getStaticProps() {
-// 	console.log(localStorage.getItem("taskData"))
-// 	const res = localStorage.getItem("taskData");
-// 	if(!res){
-// 		localStorage.setItem("taskData",JSON.stringify([
-// 			{
-// 				"task":"Complete online JavaScript course",
-// 				"status":"completed"
-// 			},
-// 			{
-// 				"task":"Jog around the park 3x",
-// 				"status":"active"
-// 			},
-// 			{
-// 				"task":"10 minutes meditation",
-// 				"status":"active"
-// 			},
-// 			{
-// 				"task":"Read for 1 hour",
-// 				"status":"active"
-// 			},
-// 			{
-// 				"task":"Pick up groceries",
-// 				"status":"active"
-// 			},
-// 			{
-// 				"task":"Complete Todo App on Frontend Mentor",
-// 				"status":"active"
-// 			}
-// 		]))
-// 		res = JSON.parse(localStorage.getItem("taskData"));
-// 		return {
-// 			props: {
-// 				res,
-// 			}
-// 		}
-// 	}
-// 	else {
-// 		return {
-// 			props: {
-// 				res,
-// 			}
-// 		}
-// 	}
-// }
