@@ -282,7 +282,7 @@ export default function Home() {
 				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin = "true"/>
 				<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet" />
 			</Head>
-			<div className='max-w-[32rem] w-full m-auto flex flex-col'>
+			<div className='max-w-[32rem] h-full w-full m-auto flex flex-col'>
 				<div className='flex items-center justify-between mb-[10px]'>
 					<p className='tracking-widest text-[32px] font-[600] text-white'>TODO</p>
 					<IoSunny size={"28px"} fill={`${theme==="dark"?"white":"black"}`} className='cursor-pointer transition-all duration-300' onClick={()=>{theme ===  "dark"?setTheme("light"):setTheme("dark")}} />
@@ -295,7 +295,7 @@ export default function Home() {
 							else 
 								setNewTaskStatus("active")
 						}}>
-						<img src = "/images/icon-check.svg" className='h-[50%]' className = {`${newTaskStatus === "active"?"hidden":""}`}/>
+						<img src = "/images/icon-check.svg" className = {`${newTaskStatus === "active"?"hidden":""}`}/>
 					</div>
 					<input className='bg-[#25273c] text-[18px] grow text-[#c8cae2] focus:outline-none' placeholder='Create a new todo...' onKeyPress={addTask} />
 					{/* <p className='text-center text-[#5f6682] text-[14px]'>
@@ -309,13 +309,13 @@ export default function Home() {
 							
 							tasks.map((task)=>{
 								return(
-									<div>
+									<div key={task.id}>
 										<div key={task.id} className='flex p-[15px] gap-[25px] items-center border-b-[0.5px] border-b-[#5f668271]' onMouseEnter={() => {showCloseIcon(task.task.toLowerCase().split(" ").join())}} onMouseLeave={() => {hideCloseIcon(task.task.toLowerCase().split(" ").join())}}>
 											<div className={`${task.status === "completed" ? "bg-gradient-to-br from-[#57DDFF] to-[#C058F3]":null} h-[18px] w-[18px] rounded-full border-[1px] border-[#5f6682] cursor-pointer hover:border-white transition-all duration-300 flex items-center justify-center`} 
 												onClick={()=>{
 													changeTaskStatus(task.task.toLowerCase().split(" ").join())
 												}}>
-												<img src = "/images/icon-check.svg" className='h-[50%]' className = {`${task.status === "active"?"hidden":""}`}/>
+												<img src = "/images/icon-check.svg" className = {`${task.status === "active"?"hidden":""}`}/>
 	
 											</div>
 											<TaskName name = {task.task} status = {task.status} />
